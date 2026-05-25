@@ -572,10 +572,10 @@ export function getWebviewHtml(
     :root {
       --opencoder-header-surface: var(--background-base, var(--vscode-sideBar-background, #342815));
       --opencoder-darker-theme-surface: var(--opencoder-header-surface);
-      --opencoder-prompt-surface: var(--surface-raised-base, #3f311a);
-      --opencoder-prompt-border: var(--border-weak-base, #6a5230);
-      --opencoder-control-surface: var(--opencoder-darker-theme-surface);
-      --opencoder-control-surface-hover: var(--opencoder-darker-theme-surface);
+      --opencoder-prompt-surface: color-mix(in srgb, var(--opencoder-darker-theme-surface) 88%, var(--oc-vscode-fg) 12%);
+      --opencoder-prompt-border: color-mix(in srgb, var(--vscode-focusBorder, var(--oc-vscode-accent)) 64%, var(--oc-vscode-fg) 24%);
+      --opencoder-control-surface: color-mix(in srgb, var(--opencoder-darker-theme-surface) 82%, var(--oc-vscode-fg) 18%);
+      --opencoder-control-surface-hover: color-mix(in srgb, var(--opencoder-control-surface) 86%, var(--oc-vscode-fg) 14%);
       --background-strong: var(--opencoder-header-surface) !important;
       --background-stronger: var(--opencoder-header-surface) !important;
       --color-background-strong: var(--opencoder-header-surface) !important;
@@ -763,9 +763,9 @@ export function getWebviewHtml(
 
     [data-component="dock-prompt"] .relative:has(> .relative > [data-component="prompt-input"]) {
       background: var(--opencoder-prompt-surface) !important;
-      border: 1px solid var(--opencoder-prompt-border) !important;
+      border: 2px solid var(--opencoder-prompt-border) !important;
       border-radius: 8px !important;
-      box-shadow: none !important;
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--opencoder-prompt-border) 28%, transparent) !important;
       outline: 0 !important;
       overflow: hidden !important;
     }
