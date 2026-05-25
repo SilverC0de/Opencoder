@@ -489,13 +489,19 @@ export function getWebviewHtml(
     :root {
       --opencoder-header-surface: var(--background-base, var(--vscode-sideBar-background, #342815));
       --opencoder-darker-theme-surface: var(--opencoder-header-surface);
-      --opencoder-prompt-surface: color-mix(in srgb, var(--opencoder-header-surface) 78%, var(--text-base) 22%);
-      --opencoder-control-surface: var(--vscode-button-secondaryBackground, var(--surface-raised-stronger-non-alpha));
-      --opencoder-control-surface-hover: var(--vscode-button-secondaryHoverBackground, var(--surface-raised-base-hover));
+      --opencoder-prompt-surface: var(--surface-raised-base, #3f311a);
+      --opencoder-prompt-border: var(--border-weak-base, #6a5230);
+      --opencoder-control-surface: var(--opencoder-darker-theme-surface);
+      --opencoder-control-surface-hover: var(--opencoder-darker-theme-surface);
       --background-strong: var(--opencoder-header-surface) !important;
       --background-stronger: var(--opencoder-header-surface) !important;
       --color-background-strong: var(--opencoder-header-surface) !important;
       --color-background-stronger: var(--opencoder-header-surface) !important;
+      --surface-stronger-non-alpha: var(--opencoder-darker-theme-surface) !important;
+      --surface-interactive-weak: var(--opencoder-darker-theme-surface) !important;
+      --surface-interactive-weak-hover: var(--opencoder-darker-theme-surface) !important;
+      --surface-weak: var(--opencoder-darker-theme-surface) !important;
+      --surface-strong: var(--opencoder-darker-theme-surface) !important;
     }
 
     html,
@@ -636,35 +642,36 @@ export function getWebviewHtml(
     }
 
     [data-component="dock-prompt"] .relative:has(> .relative > [data-component="prompt-input"]) {
-      background: transparent !important;
+      background: var(--opencoder-prompt-surface) !important;
+      border: 1px solid var(--opencoder-prompt-border) !important;
+      border-radius: 8px !important;
       box-shadow: none !important;
-      border: 0 !important;
       outline: 0 !important;
-      overflow: visible !important;
-      padding-bottom: 42px !important;
+      overflow: hidden !important;
     }
 
     [data-component="dock-prompt"] .relative:has(> [data-component="prompt-input"]) {
       background: transparent !important;
       box-shadow: none !important;
+      border: 0 !important;
       border-radius: 0 !important;
-      overflow: visible !important;
-    }
-
-    [data-component="dock-prompt"] .relative:has(> .relative > [data-component="prompt-input"]) > .pointer-events-none.absolute.bottom-2 {
-      bottom: 0 !important;
+      overflow: auto !important;
     }
 
     [data-component="prompt-input"] {
       min-height: 92px;
-      padding-bottom: 14px !important;
+      padding: 12px 14px 56px !important;
       background: transparent !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
       color: var(--text-strong) !important;
       caret-color: var(--vscode-focusBorder, var(--oc-vscode-accent));
     }
 
     [data-component="prompt-input"]:focus {
-      outline: none;
+      outline: 1px solid var(--focus-border);
+      outline-offset: 1px;
     }
 
     [data-component="prompt-input"] + [aria-hidden="true"] {
@@ -672,17 +679,14 @@ export function getWebviewHtml(
       background: none !important;
     }
 
-    [data-dock-surface="shell"] {
-      box-shadow: none !important;
-      background-color: var(--opencoder-prompt-surface) !important;
-    }
-
-    [data-dock-surface="tray"] {
-      border: 0 !important;
-      box-shadow: none !important;
+    [data-component="session-prompt-dock"] :where(div):has([data-component="prompt-model-control"]),
+    [data-component="session-prompt-dock"] :where(div):has([data-component="prompt-agent-control"]),
+    [data-component="session-prompt-dock"] :where(div):has([data-component="prompt-variant-control"]) {
       background: transparent !important;
+      border: 0 !important;
       border-radius: 0 !important;
-      overflow: visible !important;
+      box-shadow: none !important;
+      outline: 0 !important;
     }
 
     [data-component="prompt-model-control"],
@@ -692,10 +696,10 @@ export function getWebviewHtml(
       align-items: center;
       min-height: 28px;
       max-width: 100%;
-      border: 0;
+      border: 1px solid var(--opencoder-prompt-border);
       border-radius: 6px;
       background: var(--opencoder-control-surface) !important;
-      box-shadow: 0 1px 0 color-mix(in srgb, var(--vscode-widget-shadow, #000) 16%, transparent);
+      box-shadow: none;
     }
 
     [data-component="prompt-model-control"]:hover,
