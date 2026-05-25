@@ -3,9 +3,9 @@
   "displayName": "Opencoder",
   "description": "VS Code sidebar client for OpenCode sessions.",
   "version": "0.1.0",
-  "publisher": "SilverC0de",
+  "publisher": "siilver",
   "license": "MIT",
-  "icon": "icon.png",
+  "icon": "opencoder.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/SilverC0de/Opencoder"
