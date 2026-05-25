@@ -212,7 +212,7 @@ export class OpenCodeSidebarProvider implements vscode.WebviewViewProvider, vsco
         await vscode.commands.executeCommand("opencoder.newSession");
         return;
       case "refresh":
-        await vscode.commands.executeCommand("opencoder.refresh");
+        await this.service.refresh();
         return;
       case "openSettings":
         await vscode.commands.executeCommand("opencoder.openSettings");

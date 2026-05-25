@@ -217,7 +217,37 @@ const statusActionsPreload = `;(function () {
   var cfg = window.__OPENCODE_VSCODE_CONFIG__ || {}
   if (cfg.settingsMode) return
 
+  function isVisible(element) {
+    if (!(element instanceof HTMLElement)) return false
+    var rect = element.getBoundingClientRect()
+    var style = window.getComputedStyle(element)
+    return rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden"
+  }
+
+  function openSessionHistoryMenu() {
+    var selectors = [
+      'button[aria-label*="sidebar" i]',
+      'button[aria-label*="menu" i]',
+      'button.group\\\\/sidebar-toggle',
+      '.titlebar-icon[aria-expanded]'
+    ]
+
+    for (var selectorIndex = 0; selectorIndex < selectors.length; selectorIndex += 1) {
+      var matches = Array.prototype.slice.call(document.querySelectorAll(selectors[selectorIndex]))
+      for (var index = 0; index < matches.length; index += 1) {
+        var button = matches[index]
+        if (!(button instanceof HTMLElement) || button.closest(".opencoder-titlebar-actions") || !isVisible(button)) continue
+        if ((button.getAttribute("aria-label") || "").toLowerCase().indexOf("status") !== -1) continue
+        if (button.getAttribute("aria-expanded") !== "true") button.click()
+        return true
+      }
+    }
+
+    return false
+  }
+
   function send(action) {
+    if (action === "history" && openSessionHistoryMenu()) return
     window.postMessage({ type: "hostAction", action: action }, "*")
   }
 
@@ -760,10 +790,10 @@ export function getWebviewHtml(
     [data-action="prompt-submit"],
     [data-component="dock-prompt"] [data-action="prompt-attach"],
     [data-component="dock-prompt"] [data-action="prompt-submit"] {
-      width: 24px !important;
-      height: 24px !important;
-      min-width: 24px !important;
-      min-height: 24px !important;
+      width: 28px !important;
+      height: 28px !important;
+      min-width: 28px !important;
+      min-height: 28px !important;
       padding: 0 !important;
       border-radius: 5px !important;
       box-shadow: none !important;
@@ -786,21 +816,24 @@ export function getWebviewHtml(
     [data-action="prompt-submit"] [data-component="icon"],
     [data-component="dock-prompt"] [data-action="prompt-attach"] [data-component="icon"],
     [data-component="dock-prompt"] [data-action="prompt-submit"] [data-component="icon"] {
-      width: 14px !important;
-      height: 14px !important;
-      min-width: 14px !important;
-      min-height: 14px !important;
+      width: 16px !important;
+      height: 16px !important;
+      min-width: 16px !important;
+      min-height: 16px !important;
     }
 
     [data-action="prompt-attach"] [data-component="icon"] svg,
     [data-action="prompt-submit"] [data-component="icon"] svg,
     [data-action="prompt-attach"] [data-slot="icon-svg"],
     [data-action="prompt-submit"] [data-slot="icon-svg"] {
-      width: 14px !important;
-      height: 14px !important;
-      min-width: 14px !important;
-      min-height: 14px !important;
+      width: 16px !important;
+      height: 16px !important;
+      min-width: 16px !important;
+      min-height: 16px !important;
       stroke-width: 1.6 !important;
+      fill: currentColor !important;
+      stroke: currentColor !important;
+      color: inherit !important;
     }
 
     [data-component="session-prompt-dock"] :where(div):has([data-component="prompt-model-control"]),
