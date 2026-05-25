@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { OpenCodeService } from "./opencodeService";
 import { OpenCodeSidebarProvider } from "./sidebarProvider";
 import { OpenCodeSettingsPanel } from "./settingsPanel";
+import { sameWorkspace } from "./pathUtils";
 
 export async function activate(context: vscode.ExtensionContext) {
   const service       = new OpenCodeService(context);
@@ -105,14 +106,18 @@ export async function activate(context: vscode.ExtensionContext) {
         () => service.listAllSessions().catch(() => []),
       );
 
-      if (all.length === 0) {
-        void vscode.window.showInformationMessage("No OpenCode sessions available.");
+      const projectDir = state.workspace.directory;
+      const scoped = projectDir
+        ? all.filter((s) => s.directory && sameWorkspace(s.directory, projectDir))
+        : all;
+
+      if (scoped.length === 0) {
+        void vscode.window.showInformationMessage("No OpenCode sessions available for this project.");
         return;
       }
 
-      const items = all.map((s) => ({
+      const items = scoped.map((s) => ({
         label: s.title || "Untitled session",
-        description: s.directory ?? "",
         detail: new Date(s.updated).toLocaleString(),
         picked: s.id === state.activeSessionId,
         sessionId: s.id,
@@ -121,7 +126,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
       const selected = await vscode.window.showQuickPick(items, {
         placeHolder: "Select a session",
-        matchOnDescription: true,
         canPickMany: false,
       });
 
