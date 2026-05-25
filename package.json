@@ -1,0 +1,231 @@
+{
+  "name": "opencoder",
+  "displayName": "Opencoder",
+  "description": "VS Code sidebar client for OpenCode sessions.",
+  "version": "0.1.0",
+  "publisher": "SilverC0de",
+  "license": "MIT",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": ["Other", "Chat"],
+  "keywords": ["opencoder", "opencode", "ai", "assistant", "chat", "sidebar"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "opencoder",
+          "title": "Opencoder",
+          "icon": "media/opencode.svg"
+        }
+      ]
+    },
+    "views": {
+      "opencoder": [
+        {
+          "type": "webview",
+          "id": "opencoder.sidebar",
+          "name": "Opencoder",
+          "icon": "media/opencode.svg"
+        }
+      ]
+    },
+    "commands": [
+      { "command": "opencoder.focus", "title": "Opencoder: Focus Sidebar" },
+      { "command": "opencoder.newSession", "title": "Opencoder: New Session", "icon": "$(add)" },
+      { "command": "opencoder.refresh", "title": "Opencoder: Refresh", "icon": "$(refresh)" },
+      { "command": "opencoder.openSettings", "title": "Opencoder: Open Settings", "icon": "$(gear)" },
+      { "command": "opencoder.restartServer", "title": "Opencoder: Restart Local Server" },
+      { "command": "opencoder.openTerminal", "title": "Opencoder: Open Terminal", "icon": "$(terminal)" },
+      { "command": "opencoder.installCli", "title": "Opencoder: Install CLI" },
+      { "command": "opencoder.switchSession", "title": "Opencoder: Switch Session" }
+    ],
+    "keybindings": [
+      {
+        "command": "opencoder.focus",
+        "key": "ctrl+shift+alt+oem_period",
+        "mac": "cmd+shift+alt+oem_period",
+        "when": "editorTextFocus || terminalFocus"
+      },
+      {
+        "command": "opencoder.newSession",
+        "key": "ctrl+shift+alt+o",
+        "mac": "cmd+shift+alt+o",
+        "when": "editorTextFocus || terminalFocus"
+      },
+      {
+        "command": "opencoder.switchSession",
+        "key": "ctrl+shift+alt+s",
+        "mac": "cmd+shift+alt+s",
+        "when": "editorTextFocus || terminalFocus"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        { "command": "opencoder.newSession", "when": "view == opencoder.sidebar", "group": "navigation@1" },
+        { "command": "opencoder.refresh", "when": "view == opencoder.sidebar", "group": "navigation@2" },
+        { "command": "opencoder.openSettings", "when": "view == opencoder.sidebar", "group": "navigation@9" }
+      ],
+      "commandPalette": [
+        { "command": "opencoder.focus" },
+        { "command": "opencoder.newSession" },
+        { "command": "opencoder.refresh" },
+        { "command": "opencoder.openSettings" },
+        { "command": "opencoder.restartServer" },
+        { "command": "opencoder.openTerminal" },
+        { "command": "opencoder.installCli" },
+        { "command": "opencoder.switchSession" }
+      ]
+    },
+    "configuration": {
+      "title": "Opencoder",
+      "properties": {
+        "opencoder.opencodePath": {
+          "type": "string",
+          "default": "opencode",
+          "description": "CLI command or path used to launch the OpenCode server."
+        },
+        "opencoder.serverBaseUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:4096",
+          "description": "Base URL for the OpenCode server."
+        },
+        "opencoder.autoStartServer": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-start `opencode serve` if the server is not running."
+        },
+        "opencoder.debugServerLogs": {
+          "type": "boolean",
+          "default": false,
+          "description": "Stream OpenCode server logs into the output channel."
+        },
+        "opencoder.language": {
+          "type": "string",
+          "enum": ["auto", "en", "zh", "zht", "ko", "de", "es", "fr", "da", "ja", "pl", "ru", "ar", "no", "br", "th", "bs", "tr"],
+          "default": "auto",
+          "description": "App language. 'auto' follows system language."
+        },
+        "opencoder.uiColorScheme": {
+          "type": "string",
+          "enum": ["system", "light", "dark"],
+          "default": "system",
+          "description": "Color scheme preference."
+        },
+        "opencoder.themeId": {
+          "type": "string",
+          "default": "oc-2",
+          "description": "OpenCode UI theme id."
+        },
+        "opencoder.uiFont": {
+          "type": "string",
+          "default": "",
+          "description": "UI font family override."
+        },
+        "opencoder.codeFont": {
+          "type": "string",
+          "default": "",
+          "description": "Code font family override."
+        },
+        "opencoder.autoSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-save edits in OpenCode sessions."
+        },
+        "opencoder.fontSize": {
+          "type": "number",
+          "default": 14,
+          "minimum": 10,
+          "maximum": 28,
+          "description": "Font size for the OpenCode UI."
+        },
+        "opencoder.showReasoningSummaries": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show reasoning summaries in the feed."
+        },
+        "opencoder.shellToolPartsExpanded": {
+          "type": "boolean",
+          "default": false,
+          "description": "Expand shell tool result parts by default."
+        },
+        "opencoder.editToolPartsExpanded": {
+          "type": "boolean",
+          "default": false,
+          "description": "Expand edit tool result parts by default."
+        },
+        "opencoder.releaseNotes": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show release notes after updates."
+        },
+        "opencoder.checkUpdatesOnStartup": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check for updates on startup."
+        },
+        "opencoder.notifyAgent": {
+          "type": "boolean",
+          "default": true,
+          "description": "Desktop notifications for agent events."
+        },
+        "opencoder.notifyPermissions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Desktop notifications for permission prompts."
+        },
+        "opencoder.notifyErrors": {
+          "type": "boolean",
+          "default": false,
+          "description": "Desktop notifications for errors."
+        },
+        "opencoder.soundAgentEnabled": { "type": "boolean", "default": true, "description": "Sound for agent notifications." },
+        "opencoder.soundAgent": { "type": "string", "default": "staplebops-01", "description": "Sound id for agent notifications." },
+        "opencoder.soundPermissionsEnabled": { "type": "boolean", "default": true, "description": "Sound for permission notifications." },
+        "opencoder.soundPermissions": { "type": "string", "default": "staplebops-02", "description": "Sound id for permission notifications." },
+        "opencoder.soundErrorsEnabled": { "type": "boolean", "default": true, "description": "Sound for error notifications." },
+        "opencoder.soundErrors": { "type": "string", "default": "nope-03", "description": "Sound id for error notifications." },
+        "opencoder.autoAcceptWorkspacePermissions": {
+          "type": "boolean",
+          "default": false,
+          "description": "Auto-accept permission prompts for the current workspace."
+        },
+        "opencoder.customKeybinds": {
+          "type": ["object", "null"],
+          "default": null,
+          "additionalProperties": { "type": "string" },
+          "description": "Override OpenCode keybinds by command id."
+        },
+        "opencoder.modelVisibility": {
+          "type": ["object", "null"],
+          "default": null,
+          "additionalProperties": { "type": "string", "enum": ["show", "hide"] },
+          "description": "Per-model visibility map."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=dist/extension.js",
+    "watch": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=dist/extension.js --watch",
+    "vscode:prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.96.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "@opencode-ai/sdk": "^1.3.17",
+    "cross-spawn": "^7.0.6"
+  },
+  "author": "Silver",
+  "capabilities": {
+    "untrustedWorkspaces": { "supported": true },
+    "virtualWorkspaces": false
+  }
+}
