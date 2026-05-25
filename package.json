@@ -1,7 +1,7 @@
 {
   "name": "opencoder-ui",
-  "displayName": "Opencoder",
-  "description": "VS Code sidebar client for OpenCode sessions.",
+  "displayName": "Opencoder UI",
+  "description": "OpenCode VSCode Extension",
   "version": "0.1.0",
   "publisher": "siilver",
   "license": "MIT",
