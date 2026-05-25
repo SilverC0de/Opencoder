@@ -60,6 +60,10 @@ export class OpenCodeSidebarProvider implements vscode.WebviewViewProvider, vsco
     this.postMessage({ type: "hostAction", action });
   }
 
+  navigate(url: string) {
+    this.postMessage({ type: "navigate", url });
+  }
+
   notifyTheme() {
     this.postMessage({ type: "hostTheme", colorScheme: getColorScheme() });
   }

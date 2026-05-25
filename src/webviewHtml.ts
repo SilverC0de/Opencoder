@@ -361,6 +361,35 @@ const statusActionsPreload = `;(function () {
   observer.observe(document.documentElement, { childList: true, subtree: true })
 })()`;
 
+// Allows the extension host to drive the embedded SPA's router (e.g. when the
+// VS Code QuickPick is used to switch sessions). The SPA is built on a
+// history-API router that re-routes on popstate.
+const navigatePreload = `;(function () {
+  function navigate(url) {
+    if (typeof url !== "string" || !url) return
+    var current = location.pathname + location.search
+    if (current === url) return
+    try { history.pushState({}, "", url) } catch (e) { return }
+    try { window.dispatchEvent(new PopStateEvent("popstate", { state: history.state })) } catch {}
+    // Fallback: synthesize an anchor click so the router's link-delegation path also runs.
+    try {
+      var a = document.createElement("a")
+      a.href = url
+      a.setAttribute("link", "")
+      a.style.display = "none"
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+    } catch {}
+  }
+
+  window.addEventListener("message", function(event) {
+    var msg = event.data
+    if (!msg || msg.type !== "navigate") return
+    navigate(msg.url)
+  })
+})()`;
+
 // CSS that maps the OpenCode app colours to VS Code's CSS variables so the
 // webview automatically matches whatever theme the user has active — light,
 // dark, high-contrast, etc. — without any hardcoded palette.
@@ -1048,6 +1077,7 @@ export function getWebviewHtml(
     <script nonce="${nonce}">${themePreload}</script>
     <script nonce="${nonce}">${freeBadgePreload}</script>
     <script nonce="${nonce}">${statusActionsPreload}</script>
+    <script nonce="${nonce}">${navigatePreload}</script>
     <title>Opencoder</title>
   </head>
   <body class="antialiased overscroll-none overflow-hidden">

@@ -243,6 +243,16 @@ export class OpenCodeService implements vscode.Disposable {
     this.emitState();
   }
 
+  async listAllSessions() {
+    await this.ensureReady();
+    const baseUrl = this.server?.url ?? this.getSettings().serverBaseUrl;
+    const client = createOpencodeV2Client({ baseUrl, ...REQUEST_OPTIONS });
+    const sessions = this.unwrap(await client.experimental.session.list({ limit: 500 }, REQUEST_OPTIONS));
+    return sessions
+      .map((s) => ({ id: s.id, title: s.title, directory: s.directory, updated: s.time.updated }))
+      .sort((a, b) => b.updated - a.updated);
+  }
+
   async deleteSession(sessionId: string) {
     this.lastError = undefined;
     const confirmed = await vscode.window.showWarningMessage(

@@ -100,26 +100,43 @@ export async function activate(context: vscode.ExtensionContext) {
     }),
     vscode.commands.registerCommand("opencoder.switchSession", async () => {
       const state = service.getState();
-      if (state.sessions.length === 0) {
+      const all = await vscode.window.withProgress(
+        { location: { viewId: "opencoder.sidebar" } },
+        () => service.listAllSessions().catch(() => []),
+      );
+
+      if (all.length === 0) {
         void vscode.window.showInformationMessage("No OpenCode sessions available.");
         return;
       }
 
-      const items = state.sessions.map((s) => ({
+      const items = all.map((s) => ({
         label: s.title || "Untitled session",
-        description: s.id,
+        description: s.directory ?? "",
+        detail: new Date(s.updated).toLocaleString(),
         picked: s.id === state.activeSessionId,
         sessionId: s.id,
+        directory: s.directory,
       }));
 
       const selected = await vscode.window.showQuickPick(items, {
         placeHolder: "Select a session",
+        matchOnDescription: true,
         canPickMany: false,
       });
 
       if (!selected) return;
       await service.selectSession(selected.sessionId);
       await sidebar.reveal();
+      const directory = selected.directory ?? service.getActiveSessionDirectory();
+      if (directory) {
+        const bytes = new TextEncoder().encode(directory);
+        let bin = "";
+        for (const b of bytes) bin += String.fromCharCode(b);
+        const encoded = Buffer.from(bin, "binary").toString("base64")
+          .replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+        sidebar.navigate(`/${encoded}/session/${selected.sessionId}`);
+      }
     }),
   );
 
