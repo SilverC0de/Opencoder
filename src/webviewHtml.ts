@@ -756,6 +756,8 @@ export function getWebviewHtml(
       background: none !important;
     }
 
+    [data-action="prompt-attach"],
+    [data-action="prompt-submit"],
     [data-component="dock-prompt"] [data-action="prompt-attach"],
     [data-component="dock-prompt"] [data-action="prompt-submit"] {
       width: 24px !important;
@@ -763,25 +765,42 @@ export function getWebviewHtml(
       min-width: 24px !important;
       min-height: 24px !important;
       padding: 0 !important;
-      border-radius: 6px !important;
+      border-radius: 5px !important;
       box-shadow: none !important;
     }
 
+    [data-action="prompt-submit"],
     [data-component="dock-prompt"] [data-action="prompt-submit"] {
-      background: color-mix(in srgb, var(--opencoder-prompt-surface) 72%, transparent) !important;
-      border: 1px solid var(--border-weaker-base, var(--opencoder-prompt-border)) !important;
-      color: var(--text-weak) !important;
-    }
-
-    [data-component="dock-prompt"] [data-action="prompt-submit"]:hover {
-      background: var(--opencoder-control-surface) !important;
+      background: color-mix(in srgb, var(--opencoder-prompt-surface) 68%, var(--text-strong) 4%) !important;
+      border: 1px solid color-mix(in srgb, var(--opencoder-prompt-border) 55%, transparent) !important;
       color: var(--text-strong) !important;
     }
 
+    [data-action="prompt-submit"]:hover,
+    [data-component="dock-prompt"] [data-action="prompt-submit"]:hover {
+      background: color-mix(in srgb, var(--opencoder-prompt-surface) 70%, transparent) !important;
+      color: var(--text-strong) !important;
+    }
+
+    [data-action="prompt-attach"] [data-component="icon"],
+    [data-action="prompt-submit"] [data-component="icon"],
     [data-component="dock-prompt"] [data-action="prompt-attach"] [data-component="icon"],
     [data-component="dock-prompt"] [data-action="prompt-submit"] [data-component="icon"] {
-      width: 13px !important;
-      height: 13px !important;
+      width: 14px !important;
+      height: 14px !important;
+      min-width: 14px !important;
+      min-height: 14px !important;
+    }
+
+    [data-action="prompt-attach"] [data-component="icon"] svg,
+    [data-action="prompt-submit"] [data-component="icon"] svg,
+    [data-action="prompt-attach"] [data-slot="icon-svg"],
+    [data-action="prompt-submit"] [data-slot="icon-svg"] {
+      width: 14px !important;
+      height: 14px !important;
+      min-width: 14px !important;
+      min-height: 14px !important;
+      stroke-width: 1.6 !important;
     }
 
     [data-component="session-prompt-dock"] :where(div):has([data-component="prompt-model-control"]),
