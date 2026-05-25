@@ -186,14 +186,15 @@ const freeBadgePreload = `;(function () {
         var parent = node.parentElement
         if (parent && !parent.classList.contains("opencoder-free-badge")) {
           parent.classList.add("opencoder-free-badge")
+          var successColor = getComputedStyle(document.documentElement).getPropertyValue("--oc-vscode-success").trim() || "#4ade80"
           parent.style.cssText = [
-            "background: linear-gradient(135deg, rgba(74, 222, 128, 0.15), rgba(34, 197, 94, 0.1)) !important",
-            "color: #4ade80 !important",
+            "background: color-mix(in srgb, " + successColor + " 20%, transparent) !important",
+            "color: " + successColor + " !important",
             "padding: 2px 8px !important",
             "border-radius: 4px !important",
-            "border: 1px solid rgba(74, 222, 128, 0.3) !important",
+            "border: 1px solid color-mix(in srgb, " + successColor + " 40%, transparent) !important",
             "font-size: 11px !important",
-            "font-weight: 500 !important",
+            "font-weight: 600 !important",
             "letter-spacing: 0.3px !important",
             "white-space: nowrap !important",
             "display: inline-block !important"
@@ -217,37 +218,7 @@ const statusActionsPreload = `;(function () {
   var cfg = window.__OPENCODE_VSCODE_CONFIG__ || {}
   if (cfg.settingsMode) return
 
-  function isVisible(element) {
-    if (!(element instanceof HTMLElement)) return false
-    var rect = element.getBoundingClientRect()
-    var style = window.getComputedStyle(element)
-    return rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden"
-  }
-
-  function openSessionHistoryMenu() {
-    var selectors = [
-      'button[aria-label*="sidebar" i]',
-      'button[aria-label*="menu" i]',
-      'button.group\\\\/sidebar-toggle',
-      '.titlebar-icon[aria-expanded]'
-    ]
-
-    for (var selectorIndex = 0; selectorIndex < selectors.length; selectorIndex += 1) {
-      var matches = Array.prototype.slice.call(document.querySelectorAll(selectors[selectorIndex]))
-      for (var index = 0; index < matches.length; index += 1) {
-        var button = matches[index]
-        if (!(button instanceof HTMLElement) || button.closest(".opencoder-titlebar-actions") || !isVisible(button)) continue
-        if ((button.getAttribute("aria-label") || "").toLowerCase().indexOf("status") !== -1) continue
-        if (button.getAttribute("aria-expanded") !== "true") button.click()
-        return true
-      }
-    }
-
-    return false
-  }
-
   function send(action) {
-    if (action === "history" && openSessionHistoryMenu()) return
     window.postMessage({ type: "hostAction", action: action }, "*")
   }
 
@@ -640,6 +611,30 @@ export function getWebviewHtml(
       align-items: center;
       gap: 2px;
       margin-right: 4px;
+      border: 0 !important;
+      box-shadow: none !important;
+      text-decoration: none !important;
+    }
+
+    .opencoder-titlebar-actions::before,
+    .opencoder-titlebar-actions::after {
+      display: none !important;
+      content: none !important;
+    }
+
+    #opencode-titlebar-right:has(.opencoder-titlebar-actions),
+    [data-component="tabs"]:has(.opencoder-status-actions),
+    [data-opencoder-status-actions="true"],
+    [data-opencoder-status-actions="true"] [data-slot="tablist"] {
+      border-bottom: 0 !important;
+      border-top: 0 !important;
+      box-shadow: none !important;
+    }
+
+    button[aria-label*="sidebar" i]:not(.opencoder-status-action),
+    button[aria-label*="menu" i]:not(.opencoder-status-action),
+    button.group\\/sidebar-toggle {
+      display: none !important;
     }
 
     .opencoder-status-action {
@@ -936,13 +931,13 @@ export function getWebviewHtml(
     [data-component="popover"] span[class*="tag"],
     [data-component="dialog"] div[class*="pill"],
     [data-component="popover"] div[class*="pill"] {
-      background: linear-gradient(135deg, rgba(74, 222, 128, 0.15), rgba(34, 197, 94, 0.1)) !important;
-      color: #4ade80 !important;
+      background: color-mix(in srgb, var(--oc-vscode-success) 20%, transparent) !important;
+      color: var(--oc-vscode-success) !important;
       padding: 2px 8px !important;
       border-radius: 4px !important;
-      border: 1px solid rgba(74, 222, 128, 0.3) !important;
+      border: 1px solid color-mix(in srgb, var(--oc-vscode-success) 40%, transparent) !important;
       font-size: 11px !important;
-      font-weight: 500 !important;
+      font-weight: 600 !important;
       letter-spacing: 0.3px !important;
       white-space: nowrap !important;
       display: inline-block !important;
