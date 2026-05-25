@@ -228,6 +228,35 @@ const statusActionsPreload = `;(function () {
     else right.prepend(row)
   }
 
+  function commonAncestor(nodes) {
+    if (!nodes.length) return null
+    var node = nodes[0]
+    while (node) {
+      var found = true
+      for (var index = 1; index < nodes.length; index += 1) {
+        if (!node.contains(nodes[index])) {
+          found = false
+          break
+        }
+      }
+      if (found) return node
+      node = node.parentElement
+    }
+    return null
+  }
+
+  function installPromptMarkers() {
+    var controls = [
+      document.querySelector('[data-component="prompt-model-control"]'),
+      document.querySelector('[data-component="prompt-agent-control"]'),
+      document.querySelector('[data-component="prompt-variant-control"]'),
+    ].filter(Boolean)
+    if (controls.length < 3) return
+
+    var row = commonAncestor(controls)
+    if (row instanceof HTMLElement) row.setAttribute("data-opencoder-prompt-controls", "true")
+  }
+
   function isStatusPopoverTabs(element) {
     if (!(element instanceof HTMLElement)) return false
     if (element.querySelector(".opencoder-status-actions")) return false
@@ -248,6 +277,7 @@ const statusActionsPreload = `;(function () {
 
   function installActions() {
     installTitlebarActions()
+    installPromptMarkers()
 
     var tabs = Array.prototype.find.call(document.querySelectorAll('[data-component="tabs"]'), isStatusPopoverDataTabs)
       || Array.prototype.find.call(document.querySelectorAll('[data-slot="tablist"]'), function(tablist) {
@@ -687,6 +717,48 @@ export function getWebviewHtml(
       border-radius: 0 !important;
       box-shadow: none !important;
       outline: 0 !important;
+    }
+
+    [data-opencoder-prompt-controls="true"] {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      overflow-x: auto !important;
+      overflow-y: visible !important;
+      flex-wrap: nowrap !important;
+      justify-content: flex-start !important;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    [data-component="dock-prompt"] .pointer-events-none.absolute.bottom-2.left-2:has([data-opencoder-prompt-controls="true"]),
+    [data-component="dock-prompt"] [data-slot$="-footer"]:has([data-opencoder-prompt-controls="true"]) {
+      left: 0 !important;
+      right: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+
+    [data-component="session-prompt-dock"] :where(div):has(> [data-opencoder-prompt-controls="true"]) {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+
+    [data-opencoder-prompt-controls="true"]::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    [data-opencoder-prompt-controls="true"] > * {
+      flex: 0 0 auto;
     }
 
     [data-component="prompt-model-control"],
