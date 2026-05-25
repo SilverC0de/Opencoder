@@ -183,18 +183,19 @@ const freeBadgePreload = `;(function () {
     var node
     while (node = walker.nextNode()) {
       if (node.textContent.trim() === "Free" || node.textContent.includes("Free")) {
-        var parent = node.parentElement
+        var parent = node.parentElement && node.parentElement.closest('[data-component="tag"], .opencoder-free-badge, span, div')
         if (parent && !parent.classList.contains("opencoder-free-badge")) {
           parent.classList.add("opencoder-free-badge")
-          var successColor = getComputedStyle(document.documentElement).getPropertyValue("--oc-vscode-success").trim() || "#4ade80"
+          var successColor = getComputedStyle(document.documentElement).getPropertyValue("--oc-vscode-success").trim() || "#22c55e"
           parent.style.cssText = [
-            "background: color-mix(in srgb, " + successColor + " 20%, transparent) !important",
+            "background: linear-gradient(135deg, color-mix(in srgb, " + successColor + " 38%, transparent), color-mix(in srgb, " + successColor + " 18%, transparent)) !important",
             "color: " + successColor + " !important",
             "padding: 2px 8px !important",
             "border-radius: 4px !important",
-            "border: 1px solid color-mix(in srgb, " + successColor + " 40%, transparent) !important",
+            "border: 1px solid color-mix(in srgb, " + successColor + " 68%, transparent) !important",
+            "box-shadow: 0 0 0 1px color-mix(in srgb, " + successColor + " 18%, transparent), 0 0 12px color-mix(in srgb, " + successColor + " 20%, transparent) !important",
             "font-size: 11px !important",
-            "font-weight: 600 !important",
+            "font-weight: 700 !important",
             "letter-spacing: 0.3px !important",
             "white-space: nowrap !important",
             "display: inline-block !important"
@@ -706,6 +707,23 @@ export function getWebviewHtml(
       background: var(--opencoder-darker-theme-surface) !important;
     }
 
+    /* Session title styling */
+    [data-component*="session"][data-slot*="title"],
+    [data-component*="session"] h1,
+    [data-component*="session"] h2,
+    [data-component*="session"] h3,
+    [data-component="session-prompt-dock"] h1,
+    [data-component="session-prompt-dock"] h2,
+    [data-component="session-prompt-dock"] h3,
+    .session-title,
+    .session-name,
+    [contenteditable="true"]:has-text("Untitled session"),
+    [data-component*="session-title"],
+    [data-component*="session-name"] {
+      font-weight: 700 !important;
+      font-size: 1.15em !important;
+    }
+
     .bg-background-stronger,
     .bg-background-base {
       background-color: var(--opencoder-darker-theme-surface) !important;
@@ -929,15 +947,25 @@ export function getWebviewHtml(
     [data-component="popover"] span[class*="badge"],
     [data-component="dialog"] span[class*="tag"],
     [data-component="popover"] span[class*="tag"],
+    [data-component="dialog"] [data-component="tag"],
+    [data-component="popover"] [data-component="tag"],
     [data-component="dialog"] div[class*="pill"],
-    [data-component="popover"] div[class*="pill"] {
-      background: color-mix(in srgb, var(--oc-vscode-success) 20%, transparent) !important;
-      color: var(--oc-vscode-success) !important;
+    [data-component="popover"] div[class*="pill"],
+    .opencoder-free-badge {
+      background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--oc-vscode-success, #22c55e) 38%, transparent),
+        color-mix(in srgb, var(--oc-vscode-success, #22c55e) 18%, transparent)
+      ) !important;
+      color: var(--oc-vscode-success, #22c55e) !important;
       padding: 2px 8px !important;
       border-radius: 4px !important;
-      border: 1px solid color-mix(in srgb, var(--oc-vscode-success) 40%, transparent) !important;
+      border: 1px solid color-mix(in srgb, var(--oc-vscode-success, #22c55e) 68%, transparent) !important;
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--oc-vscode-success, #22c55e) 18%, transparent),
+        0 0 12px color-mix(in srgb, var(--oc-vscode-success, #22c55e) 20%, transparent) !important;
       font-size: 11px !important;
-      font-weight: 600 !important;
+      font-weight: 700 !important;
       letter-spacing: 0.3px !important;
       white-space: nowrap !important;
       display: inline-block !important;
