@@ -39,8 +39,8 @@ import { sameWorkspace, workspaceKey } from "./pathUtils";
 
 const REQUEST_OPTIONS = { responseStyle: "data" as const, throwOnError: true as const };
 
-const ACTIVE_SESSION_KEY = "opencoder.activeSession";
-const LAST_SESSION_KEY = "opencoder.lastSession";
+const ACTIVE_SESSION_KEY = "opencoder-ui.activeSession";
+const LAST_SESSION_KEY = "opencoder-ui.lastSession";
 const COMMAND_LOOKUP_TIMEOUT_MS = 2500;
 
 type LocalServerHandle = { process: ChildProcessWithoutNullStreams; url: string };
@@ -158,8 +158,8 @@ export class OpenCodeService implements vscode.Disposable {
     void vscode.window
       .showWarningMessage(this.getNetworkHint(detail), "Open Settings", "Restart Server", "Show Output")
       .then((action) => {
-        if (action === "Open Settings") void vscode.commands.executeCommand("opencoder.openSettings");
-        if (action === "Restart Server") void vscode.commands.executeCommand("opencoder.restartServer");
+        if (action === "Open Settings") void vscode.commands.executeCommand("opencoder-ui.openSettings");
+        if (action === "Restart Server") void vscode.commands.executeCommand("opencoder-ui.restartServer");
         if (action === "Show Output") this.output.show(true);
       });
   }
@@ -517,11 +517,11 @@ export class OpenCodeService implements vscode.Disposable {
                 ? path.join(npmBin, "opencode.cmd")
                 : path.join(npmBin, "opencode");
               if (await this.fileCanExecute(candidate)) {
-                await vscode.workspace.getConfiguration("opencoder").update("opencodePath", candidate, vscode.ConfigurationTarget.Global);
+                await vscode.workspace.getConfiguration("opencoder-ui").update("opencodePath", candidate, vscode.ConfigurationTarget.Global);
                 return true;
               }
             }
-            vscode.window.showInformationMessage("CLI installed but not in PATH. Restart VS Code or set opencoder.opencodePath manually.");
+            vscode.window.showInformationMessage("CLI installed but not in PATH. Restart VS Code or set opencoder-ui.opencodePath manually.");
             return true;
           }
 
@@ -532,7 +532,7 @@ export class OpenCodeService implements vscode.Disposable {
           this.output.appendLine(`[install] Failed: ${detail}`);
           const action = await vscode.window.showErrorMessage("Failed to install OpenCode CLI.", "Install Manually", "Retry");
           if (action === "Install Manually") void vscode.env.openExternal(vscode.Uri.parse("https://opencode.ai"));
-          if (action === "Retry") void vscode.commands.executeCommand("opencoder.installCli");
+          if (action === "Retry") void vscode.commands.executeCommand("opencoder-ui.installCli");
           return false;
         }
       },
@@ -1121,7 +1121,7 @@ export class OpenCodeService implements vscode.Disposable {
   }
 
   private getSettings() {
-    const c = vscode.workspace.getConfiguration("opencoder");
+    const c = vscode.workspace.getConfiguration("opencoder-ui");
     return {
       opencodePath: c.get<string>("opencodePath", "opencode"),
       serverBaseUrl: c.get<string>("serverBaseUrl", "http://127.0.0.1:4096"),
@@ -1369,15 +1369,15 @@ export class OpenCodeService implements vscode.Disposable {
 
   private formatError(error: unknown) {
     const text = error instanceof Error ? error.message : String(error);
-    if (/executable not found at configured path:/i.test(text)) return `${text}. Update opencoder.opencodePath.`;
-    if (/enoent|not recognized as an internal or external command|spawn\s+.*\s+enoent/i.test(text)) return "OpenCode CLI not found. Install OpenCode or set opencoder.opencodePath.";
+    if (/executable not found at configured path:/i.test(text)) return `${text}. Update opencoder-ui.opencodePath.`;
+    if (/enoent|not recognized as an internal or external command|spawn\s+.*\s+enoent/i.test(text)) return "OpenCode CLI not found. Install OpenCode or set opencoder-ui.opencodePath.";
     if (/timed out while starting/i.test(text)) return "Timed out starting OpenCode server.";
     return text;
   }
 
   private getNetworkHint(detail: string) {
-    if (/enoent|not found|spawn/i.test(detail)) return "OpenCode CLI not in PATH. Set opencoder.opencodePath to the full path.";
-    if (/econnrefused|econnreset|fetch failed|timed out|enotfound|socket/i.test(detail.toLowerCase())) return "OpenCode server unreachable. Check opencoder.serverBaseUrl.";
+    if (/enoent|not found|spawn/i.test(detail)) return "OpenCode CLI not in PATH. Set opencoder-ui.opencodePath to the full path.";
+    if (/econnrefused|econnreset|fetch failed|timed out|enotfound|socket/i.test(detail.toLowerCase())) return "OpenCode server unreachable. Check opencoder-ui.serverBaseUrl.";
     return "OpenCode request failed. Check the output channel for details.";
   }
 

@@ -69,7 +69,7 @@ export class OpenCodeSettingsPanel implements vscode.Disposable {
 
   private async createPanel() {
     const panel = vscode.window.createWebviewPanel(
-      "opencoder.settings",
+      "opencoder-ui.settings",
       "Opencoder Settings",
       { viewColumn: vscode.ViewColumn.Active, preserveFocus: false },
       { enableScripts: true, retainContextWhenHidden: true, localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, "media")] },
@@ -170,7 +170,7 @@ export class OpenCodeSettingsPanel implements vscode.Disposable {
 
         case "restartServer":
           try {
-            await vscode.commands.executeCommand("opencoder.restartServer");
+            await vscode.commands.executeCommand("opencoder-ui.restartServer");
             this.postMessage({ type: "restartServerResult", requestId: message.requestId });
           } catch (error) {
             this.postMessage({ type: "restartServerResult", requestId: message.requestId, error: String(error instanceof Error ? error.message : error) });

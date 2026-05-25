@@ -35,7 +35,7 @@ export type NativeSettings = {
 };
 
 export function getNativeSettings(): NativeSettings {
-  const c = vscode.workspace.getConfiguration("opencoder");
+  const c = vscode.workspace.getConfiguration("opencoder-ui");
   return {
     language: c.get("language", "auto"),
     uiColorScheme: c.get("uiColorScheme", "system"),
@@ -65,7 +65,7 @@ export function getNativeSettings(): NativeSettings {
 }
 
 export function getExtensionSettings(): ExtensionSettings {
-  const c = vscode.workspace.getConfiguration("opencoder");
+  const c = vscode.workspace.getConfiguration("opencoder-ui");
   return {
     opencodePath: c.get("opencodePath", "opencode"),
     serverBaseUrl: c.get("serverBaseUrl", "http://127.0.0.1:4096"),
@@ -75,7 +75,7 @@ export function getExtensionSettings(): ExtensionSettings {
 }
 
 export async function setExtensionSetting(key: ExtensionSettingKey, value: string | boolean) {
-  const c = vscode.workspace.getConfiguration("opencoder");
+  const c = vscode.workspace.getConfiguration("opencoder-ui");
 
   if ((key === "opencodePath" || key === "serverBaseUrl") && typeof value !== "string") {
     throw new Error(`Invalid value for ${key}`);

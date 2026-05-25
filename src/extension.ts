@@ -11,7 +11,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Status bar item
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-  statusBar.command = "opencoder.focus";
+  statusBar.command = "opencoder-ui.focus";
   context.subscriptions.push(
     statusBar,
     service.onDidChangeState((state) => {
@@ -20,17 +20,17 @@ export async function activate(context: vscode.ExtensionContext) {
         statusBar.text = "$(check)";
         statusBar.tooltip = `Connected to ${connection.baseUrl}`;
         statusBar.backgroundColor = undefined;
-        statusBar.command = "opencoder.focus";
+        statusBar.command = "opencoder-ui.focus";
       } else if (connection.status === "connecting") {
         statusBar.text = "$(sync~spin)";
         statusBar.tooltip = connection.error ?? "Connecting...";
         statusBar.backgroundColor = undefined;
-        statusBar.command = "opencoder.focus";
+        statusBar.command = "opencoder-ui.focus";
       } else {
         statusBar.text = "$(warning)";
         statusBar.tooltip = connection.error ?? "Connection error";
         statusBar.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
-        statusBar.command = "opencoder.openSettings";
+        statusBar.command = "opencoder-ui.openSettings";
       }
       statusBar.show();
     }),
@@ -56,7 +56,7 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.window.onDidChangeActiveTextEditor(() => syncWorkspace(false)),
     vscode.workspace.onDidChangeWorkspaceFolders(() => syncWorkspace(true)),
     vscode.workspace.onDidChangeConfiguration((event) => {
-      if (!event.affectsConfiguration("opencoder")) return;
+      if (!event.affectsConfiguration("opencoder-ui")) return;
       void sidebar.reload();
       void settingsPanel.reload();
     }),
@@ -69,40 +69,40 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Commands
   context.subscriptions.push(
-    vscode.commands.registerCommand("opencoder.focus", async () => {
+    vscode.commands.registerCommand("opencoder-ui.focus", async () => {
       await sidebar.reveal();
     }),
-    vscode.commands.registerCommand("opencoder.newSession", async () => {
+    vscode.commands.registerCommand("opencoder-ui.newSession", async () => {
       await sidebar.reveal();
       sidebar.dispatchAction("newSession");
     }),
-    vscode.commands.registerCommand("opencoder.refresh", async () => {
+    vscode.commands.registerCommand("opencoder-ui.refresh", async () => {
       await sidebar.reload();
       await sidebar.reveal();
     }),
-    vscode.commands.registerCommand("opencoder.openSettings", async () => {
+    vscode.commands.registerCommand("opencoder-ui.openSettings", async () => {
       await settingsPanel.open();
     }),
-    vscode.commands.registerCommand("opencoder.restartServer", async () => {
+    vscode.commands.registerCommand("opencoder-ui.restartServer", async () => {
       await service.ensureServerReady(true);
       await sidebar.reload();
       await settingsPanel.reload();
     }),
-    vscode.commands.registerCommand("opencoder.openTerminal", async () => {
-      const settings = vscode.workspace.getConfiguration("opencoder");
+    vscode.commands.registerCommand("opencoder-ui.openTerminal", async () => {
+      const settings = vscode.workspace.getConfiguration("opencoder-ui");
       const opencodePath = settings.get<string>("opencodePath", "opencode");
       const cwd = service.getWorkspaceContext().directory;
       const terminal = vscode.window.createTerminal({ name: "Opencoder", cwd });
       terminal.sendText(opencodePath);
       terminal.show();
     }),
-    vscode.commands.registerCommand("opencoder.installCli", async () => {
+    vscode.commands.registerCommand("opencoder-ui.installCli", async () => {
       await service.installCli();
     }),
-    vscode.commands.registerCommand("opencoder.switchSession", async () => {
+    vscode.commands.registerCommand("opencoder-ui.switchSession", async () => {
       const state = service.getState();
       const all = await vscode.window.withProgress(
-        { location: { viewId: "opencoder.sidebar" } },
+        { location: { viewId: "opencoder-ui.sidebar" } },
         () => service.listAllSessions().catch(() => []),
       );
 

@@ -18,7 +18,7 @@ const DIFF_SCHEME = "opencoder-diff";
 const MAX_DIFF_ENTRIES = 200;
 
 export class OpenCodeSidebarProvider implements vscode.WebviewViewProvider, vscode.Disposable {
-  static readonly viewId = "opencoder.sidebar";
+  static readonly viewId = "opencoder-ui.sidebar";
 
   private readonly disposables: vscode.Disposable[] = [];
   private readonly fetches = new Map<string, AbortController>();
@@ -48,7 +48,7 @@ export class OpenCodeSidebarProvider implements vscode.WebviewViewProvider, vsco
   }
 
   async reveal() {
-    await vscode.commands.executeCommand("workbench.view.extension.opencoder");
+    await vscode.commands.executeCommand("workbench.view.extension.opencoder-ui");
     this.view?.show?.(true);
   }
 
@@ -115,7 +115,7 @@ export class OpenCodeSidebarProvider implements vscode.WebviewViewProvider, vsco
           return;
 
         case "openSettings":
-          await vscode.commands.executeCommand("opencoder.openSettings");
+          await vscode.commands.executeCommand("opencoder-ui.openSettings");
           return;
 
         case "pickDirectory":
@@ -151,7 +151,7 @@ export class OpenCodeSidebarProvider implements vscode.WebviewViewProvider, vsco
 
         case "restartServer":
           try {
-            await vscode.commands.executeCommand("opencoder.restartServer");
+            await vscode.commands.executeCommand("opencoder-ui.restartServer");
             this.postMessage({ type: "restartServerResult", requestId: message.requestId });
           } catch (error) {
             this.postMessage({ type: "restartServerResult", requestId: message.requestId, error: String(error instanceof Error ? error.message : error) });
@@ -213,17 +213,17 @@ export class OpenCodeSidebarProvider implements vscode.WebviewViewProvider, vsco
   private async handleHostAction(action: HostAction) {
     switch (action) {
       case "newSession":
-        await vscode.commands.executeCommand("opencoder.newSession");
+        await vscode.commands.executeCommand("opencoder-ui.newSession");
         return;
       case "refresh":
         await this.service.refresh();
         await this.render();
         return;
       case "openSettings":
-        await vscode.commands.executeCommand("opencoder.openSettings");
+        await vscode.commands.executeCommand("opencoder-ui.openSettings");
         return;
       case "history":
-        await vscode.commands.executeCommand("opencoder.switchSession");
+        await vscode.commands.executeCommand("opencoder-ui.switchSession");
         return;
     }
   }
