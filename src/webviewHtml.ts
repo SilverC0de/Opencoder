@@ -219,7 +219,22 @@ const statusActionsPreload = `;(function () {
   var cfg = window.__OPENCODE_VSCODE_CONFIG__ || {}
   if (cfg.settingsMode) return
 
+  // Patch acquireVsCodeApi to cache its return value so both this preload
+  // and the app bundle can call it without hitting the "only once" restriction.
+  if (typeof window.acquireVsCodeApi === "function") {
+    var _origAcquire = window.acquireVsCodeApi
+    var _vsApi
+    window.acquireVsCodeApi = function() {
+      if (!_vsApi) _vsApi = _origAcquire()
+      return _vsApi
+    }
+  }
+
   function send(action) {
+    try {
+      var api = typeof acquireVsCodeApi === "function" ? acquireVsCodeApi() : null
+      if (api) { api.postMessage({ type: "hostAction", action: action }); return }
+    } catch(e) {}
     window.postMessage({ type: "hostAction", action: action }, "*")
   }
 
