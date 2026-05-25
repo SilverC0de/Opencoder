@@ -1,4 +1,4 @@
-export type HostAction = "newSession" | "refresh" | "openSettings";
+export type HostAction = "newSession" | "refresh" | "openSettings" | "history";
 
 export type ExtensionSettingKey = "opencodePath" | "serverBaseUrl" | "autoStartServer" | "debugServerLogs";
 
@@ -24,6 +24,7 @@ export type HostToWebviewMessage =
 
 export type WebviewToHostMessage =
   | { type: "webviewReady" }
+  | { type: "hostAction"; action: HostAction }
   | { type: "openLink"; url: string }
   | { type: "openSettings" }
   | { type: "openDiff"; filePath: string; before: string; after: string }

@@ -40,7 +40,7 @@
       { "command": "opencoder.restartServer", "title": "Opencoder: Restart Local Server" },
       { "command": "opencoder.openTerminal", "title": "Opencoder: Open Terminal", "icon": "$(terminal)" },
       { "command": "opencoder.installCli", "title": "Opencoder: Install CLI" },
-      { "command": "opencoder.switchSession", "title": "Opencoder: Switch Session" }
+      { "command": "opencoder.switchSession", "title": "Opencoder: Switch Session", "icon": "$(history)" }
     ],
     "keybindings": [
       {

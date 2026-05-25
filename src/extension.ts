@@ -16,17 +16,17 @@ export async function activate(context: vscode.ExtensionContext) {
     service.onDidChangeState((state) => {
       const { connection } = state;
       if (connection.status === "connected") {
-        statusBar.text = "$(check) Opencoder";
+        statusBar.text = "$(check)";
         statusBar.tooltip = `Connected to ${connection.baseUrl}`;
         statusBar.backgroundColor = undefined;
         statusBar.command = "opencoder.focus";
       } else if (connection.status === "connecting") {
-        statusBar.text = "$(sync~spin) Opencoder";
+        statusBar.text = "$(sync~spin)";
         statusBar.tooltip = connection.error ?? "Connecting...";
         statusBar.backgroundColor = undefined;
         statusBar.command = "opencoder.focus";
       } else {
-        statusBar.text = "$(warning) Opencoder";
+        statusBar.text = "$(warning)";
         statusBar.tooltip = connection.error ?? "Connection error";
         statusBar.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
         statusBar.command = "opencoder.openSettings";

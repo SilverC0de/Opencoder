@@ -94,6 +94,10 @@ export class OpenCodeSidebarProvider implements vscode.WebviewViewProvider, vsco
           storageBridge.ready("sidebar");
           return;
 
+        case "hostAction":
+          await this.handleHostAction(message.action);
+          return;
+
         case "openLink":
           await vscode.env.openExternal(vscode.Uri.parse(message.url));
           return;
@@ -199,6 +203,23 @@ export class OpenCodeSidebarProvider implements vscode.WebviewViewProvider, vsco
       );
       editor.selection = selection;
       editor.revealRange(selection, vscode.TextEditorRevealType.InCenter);
+    }
+  }
+
+  private async handleHostAction(action: HostAction) {
+    switch (action) {
+      case "newSession":
+        await vscode.commands.executeCommand("opencoder.newSession");
+        return;
+      case "refresh":
+        await vscode.commands.executeCommand("opencoder.refresh");
+        return;
+      case "openSettings":
+        await vscode.commands.executeCommand("opencoder.openSettings");
+        return;
+      case "history":
+        await vscode.commands.executeCommand("opencoder.switchSession");
+        return;
     }
   }
 

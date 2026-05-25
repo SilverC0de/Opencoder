@@ -221,11 +221,7 @@ const statusActionsPreload = `;(function () {
     window.postMessage({ type: "hostAction", action: action }, "*")
   }
 
-  var icons = {
-    add: '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3.25v9.5M3.25 8h9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
-    refresh: '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M12.25 5.25A4.75 4.75 0 1 0 13 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.25 2.75v2.5h-2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    settings: '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6.9 2.75h2.2l.34 1.32c.32.12.62.29.9.51l1.31-.38 1.1 1.9-.98.95c.03.16.04.32.04.49s-.01.33-.04.49l.98.95-1.1 1.9-1.31-.38c-.28.22-.58.39-.9.51l-.34 1.32H6.9l-.34-1.32a3.75 3.75 0 0 1-.9-.51l-1.31.38-1.1-1.9.98-.95a3.07 3.07 0 0 1-.04-.49c0-.17.01-.33.04-.49l-.98-.95 1.1-1.9 1.31.38c.28-.22.58-.39.9-.51l.34-1.32Z" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.65" stroke="currentColor" stroke-width="1.25"/></svg>'
-  }
+  var icons = { add: "add", refresh: "refresh", settings: "gear", history: "history" }
 
   function makeButton(action, icon, label) {
     var button = document.createElement("button")
@@ -240,9 +236,8 @@ const statusActionsPreload = `;(function () {
     })
 
     var iconEl = document.createElement("span")
-    iconEl.className = "opencoder-status-action-icon"
+    iconEl.className = "opencoder-status-action-icon codicon codicon-" + (icons[icon] || icon)
     iconEl.setAttribute("aria-hidden", "true")
-    iconEl.innerHTML = icons[icon] || ""
 
     var labelEl = document.createElement("span")
     labelEl.className = "opencoder-status-action-label"
@@ -262,6 +257,7 @@ const statusActionsPreload = `;(function () {
     row.className = "opencoder-titlebar-actions"
     row.append(
       makeButton("newSession", "add", "New Session"),
+      makeButton("history", "history", "History"),
       makeButton("refresh", "refresh", "Refresh"),
       makeButton("openSettings", "settings", "Settings"),
     )
@@ -295,7 +291,19 @@ const statusActionsPreload = `;(function () {
     if (controls.length < 3) return
 
     var row = commonAncestor(controls)
-    if (row instanceof HTMLElement) row.setAttribute("data-opencoder-prompt-controls", "true")
+    if (!(row instanceof HTMLElement)) return
+
+    row.setAttribute("data-opencoder-prompt-controls", "true")
+    controls[0].setAttribute("data-opencoder-prompt-first-control", "true")
+
+    var parent = row.parentElement
+    var depth = 0
+    while (parent && depth < 4) {
+      parent.setAttribute("data-opencoder-prompt-controls-wrap", "true")
+      if (parent.matches('[data-component="dock-prompt"]')) break
+      parent = parent.parentElement
+      depth += 1
+    }
   }
 
   function isStatusPopoverTabs(element) {
@@ -331,6 +339,7 @@ const statusActionsPreload = `;(function () {
     row.className = "opencoder-status-actions"
     row.append(
       makeButton("newSession", "add", "New Session"),
+      makeButton("history", "history", "History"),
       makeButton("refresh", "refresh", "Refresh"),
       makeButton("openSettings", "settings", "Settings"),
     )
@@ -542,6 +551,7 @@ export function getWebviewHtml(
   const nonce = createNonce();
   const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "media", "app", "app.js"));
   const styleUri  = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "media", "app", "app.css"));
+  const codiconStyleUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "media", "codicons", "codicon.css"));
 
   const systemThemeCSS = `<style nonce="${nonce}">${buildSystemThemeCSS(config.colorScheme)}</style>`;
 
@@ -656,18 +666,14 @@ export function getWebviewHtml(
 
     .opencoder-status-action-icon {
       display: inline-flex;
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       justify-content: center;
       align-items: center;
       color: var(--text-strong);
       flex: 0 0 auto;
-    }
-
-    .opencoder-status-action-icon svg {
-      display: block;
-      width: 14px;
-      height: 14px;
+      font-size: 16px;
+      line-height: 1;
     }
 
     [data-component="session-prompt-dock"],
@@ -750,6 +756,34 @@ export function getWebviewHtml(
       background: none !important;
     }
 
+    [data-component="dock-prompt"] [data-action="prompt-attach"],
+    [data-component="dock-prompt"] [data-action="prompt-submit"] {
+      width: 24px !important;
+      height: 24px !important;
+      min-width: 24px !important;
+      min-height: 24px !important;
+      padding: 0 !important;
+      border-radius: 6px !important;
+      box-shadow: none !important;
+    }
+
+    [data-component="dock-prompt"] [data-action="prompt-submit"] {
+      background: color-mix(in srgb, var(--opencoder-prompt-surface) 72%, transparent) !important;
+      border: 1px solid var(--border-weaker-base, var(--opencoder-prompt-border)) !important;
+      color: var(--text-weak) !important;
+    }
+
+    [data-component="dock-prompt"] [data-action="prompt-submit"]:hover {
+      background: var(--opencoder-control-surface) !important;
+      color: var(--text-strong) !important;
+    }
+
+    [data-component="dock-prompt"] [data-action="prompt-attach"] [data-component="icon"],
+    [data-component="dock-prompt"] [data-action="prompt-submit"] [data-component="icon"] {
+      width: 13px !important;
+      height: 13px !important;
+    }
+
     [data-component="session-prompt-dock"] :where(div):has([data-component="prompt-model-control"]),
     [data-component="session-prompt-dock"] :where(div):has([data-component="prompt-agent-control"]),
     [data-component="session-prompt-dock"] :where(div):has([data-component="prompt-variant-control"]) {
@@ -773,6 +807,13 @@ export function getWebviewHtml(
       justify-content: flex-start !important;
       scrollbar-width: none;
       -ms-overflow-style: none;
+    }
+
+    [data-opencoder-prompt-controls-wrap="true"] {
+      left: 0 !important;
+      padding-left: 0 !important;
+      margin-left: 0 !important;
+      transform: none !important;
     }
 
     [data-component="dock-prompt"] .pointer-events-none.absolute.bottom-2.left-2:has([data-opencoder-prompt-controls="true"]),
@@ -800,6 +841,11 @@ export function getWebviewHtml(
 
     [data-opencoder-prompt-controls="true"] > * {
       flex: 0 0 auto;
+      margin-left: 0 !important;
+    }
+
+    [data-opencoder-prompt-first-control="true"] {
+      margin-left: 0 !important;
     }
 
     [data-component="prompt-model-control"],
@@ -810,7 +856,7 @@ export function getWebviewHtml(
       min-height: 28px;
       max-width: 100%;
       border: 1px solid var(--opencoder-prompt-border);
-      border-radius: 6px;
+      border-radius: 8px;
       background: var(--opencoder-control-surface) !important;
       box-shadow: none;
     }
@@ -876,6 +922,7 @@ export function getWebviewHtml(
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="${styleUri}" rel="stylesheet" />
+    <link href="${codiconStyleUri}" rel="stylesheet" />
     ${systemThemeCSS}
     ${codeBlockCSS}
     ${statusActionsCSS}
