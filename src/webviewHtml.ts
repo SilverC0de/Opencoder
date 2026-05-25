@@ -172,6 +172,47 @@ const storagePreload = `;(function () {
   })
 })()`;
 
+const freeBadgePreload = `;(function () {
+  function styleFreeBadges() {
+    var walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT,
+      null
+    )
+
+    var node
+    while (node = walker.nextNode()) {
+      if (node.textContent.trim() === "Free" || node.textContent.includes("Free")) {
+        var parent = node.parentElement
+        if (parent && !parent.classList.contains("opencoder-free-badge")) {
+          parent.classList.add("opencoder-free-badge")
+          parent.style.cssText = [
+            "background: linear-gradient(135deg, rgba(74, 222, 128, 0.15), rgba(34, 197, 94, 0.1)) !important",
+            "color: #4ade80 !important",
+            "padding: 2px 8px !important",
+            "border-radius: 4px !important",
+            "border: 1px solid rgba(74, 222, 128, 0.3) !important",
+            "font-size: 11px !important",
+            "font-weight: 500 !important",
+            "letter-spacing: 0.3px !important",
+            "white-space: nowrap !important",
+            "display: inline-block !important"
+          ].join(";")
+        }
+      }
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", styleFreeBadges, { once: true })
+  } else {
+    styleFreeBadges()
+  }
+
+  var observer = new MutationObserver(styleFreeBadges)
+  observer.observe(document.body, { childList: true, subtree: true })
+})()`;
+
 const statusActionsPreload = `;(function () {
   var cfg = window.__OPENCODE_VSCODE_CONFIG__ || {}
   if (cfg.settingsMode) return
@@ -779,6 +820,35 @@ export function getWebviewHtml(
     [data-component="prompt-variant-control"]:hover {
       background: var(--opencoder-control-surface-hover) !important;
     }
+
+    /* Green badge styling for Free tier models */
+    [data-component="dialog"] [role="option"] span,
+    [data-component="popover"] [role="option"] span {
+      transition: all 0.2s ease;
+    }
+
+    /* Target badge elements in model/option lists */
+    [data-component="dialog"] [role="option"] span[style*="background"],
+    [data-component="popover"] [role="option"] span[style*="background"],
+    [data-component="dialog"] span.badge,
+    [data-component="popover"] span.badge,
+    [data-component="dialog"] span[class*="badge"],
+    [data-component="popover"] span[class*="badge"],
+    [data-component="dialog"] span[class*="tag"],
+    [data-component="popover"] span[class*="tag"],
+    [data-component="dialog"] div[class*="pill"],
+    [data-component="popover"] div[class*="pill"] {
+      background: linear-gradient(135deg, rgba(74, 222, 128, 0.15), rgba(34, 197, 94, 0.1)) !important;
+      color: #4ade80 !important;
+      padding: 2px 8px !important;
+      border-radius: 4px !important;
+      border: 1px solid rgba(74, 222, 128, 0.3) !important;
+      font-size: 11px !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.3px !important;
+      white-space: nowrap !important;
+      display: inline-block !important;
+    }
   </style>`;
 
   const settingsModeCSS = config.settingsMode
@@ -813,6 +883,7 @@ export function getWebviewHtml(
     <script nonce="${nonce}">window.__OPENCODE_VSCODE_CONFIG__ = ${JSON.stringify(config)};</script>
     <script nonce="${nonce}">${storagePreload}</script>
     <script nonce="${nonce}">${themePreload}</script>
+    <script nonce="${nonce}">${freeBadgePreload}</script>
     <script nonce="${nonce}">${statusActionsPreload}</script>
     <title>Opencoder</title>
   </head>
