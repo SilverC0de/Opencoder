@@ -63,11 +63,6 @@
       }
     ],
     "menus": {
-      "view/title": [
-        { "command": "opencoder.newSession", "when": "view == opencoder.sidebar", "group": "navigation@1" },
-        { "command": "opencoder.refresh", "when": "view == opencoder.sidebar", "group": "navigation@2" },
-        { "command": "opencoder.openSettings", "when": "view == opencoder.sidebar", "group": "navigation@9" }
-      ],
       "commandPalette": [
         { "command": "opencoder.focus" },
         { "command": "opencoder.newSession" },

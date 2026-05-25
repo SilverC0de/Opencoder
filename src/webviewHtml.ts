@@ -172,6 +172,113 @@ const storagePreload = `;(function () {
   })
 })()`;
 
+const statusActionsPreload = `;(function () {
+  var cfg = window.__OPENCODE_VSCODE_CONFIG__ || {}
+  if (cfg.settingsMode) return
+
+  function send(action) {
+    window.postMessage({ type: "hostAction", action: action }, "*")
+  }
+
+  var icons = {
+    add: '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3.25v9.5M3.25 8h9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    refresh: '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M12.25 5.25A4.75 4.75 0 1 0 13 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.25 2.75v2.5h-2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    settings: '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6.9 2.75h2.2l.34 1.32c.32.12.62.29.9.51l1.31-.38 1.1 1.9-.98.95c.03.16.04.32.04.49s-.01.33-.04.49l.98.95-1.1 1.9-1.31-.38c-.28.22-.58.39-.9.51l-.34 1.32H6.9l-.34-1.32a3.75 3.75 0 0 1-.9-.51l-1.31.38-1.1-1.9.98-.95a3.07 3.07 0 0 1-.04-.49c0-.17.01-.33.04-.49l-.98-.95 1.1-1.9 1.31.38c.28-.22.58-.39.9-.51l.34-1.32Z" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.65" stroke="currentColor" stroke-width="1.25"/></svg>'
+  }
+
+  function makeButton(action, icon, label) {
+    var button = document.createElement("button")
+    button.type = "button"
+    button.className = "opencoder-status-action"
+    button.setAttribute("aria-label", label)
+    button.title = label
+    button.addEventListener("click", function(event) {
+      event.preventDefault()
+      event.stopPropagation()
+      send(action)
+    })
+
+    var iconEl = document.createElement("span")
+    iconEl.className = "opencoder-status-action-icon"
+    iconEl.setAttribute("aria-hidden", "true")
+    iconEl.innerHTML = icons[icon] || ""
+
+    var labelEl = document.createElement("span")
+    labelEl.className = "opencoder-status-action-label"
+    labelEl.textContent = label
+
+    button.append(iconEl, labelEl)
+    return button
+  }
+
+  function installTitlebarActions() {
+    if (document.querySelector(".opencoder-titlebar-actions")) return
+    var statusTrigger = document.querySelector('[data-slot="popover-trigger"].titlebar-icon, .titlebar-icon[aria-label]')
+    var right = document.getElementById("opencode-titlebar-right") || (statusTrigger && statusTrigger.parentElement)
+    if (!right) return
+
+    var row = document.createElement("div")
+    row.className = "opencoder-titlebar-actions"
+    row.append(
+      makeButton("newSession", "add", "New Session"),
+      makeButton("refresh", "refresh", "Refresh"),
+      makeButton("openSettings", "settings", "Settings"),
+    )
+    if (statusTrigger && statusTrigger.parentNode === right) right.insertBefore(row, statusTrigger)
+    else right.prepend(row)
+  }
+
+  function isStatusPopoverTabs(element) {
+    if (!(element instanceof HTMLElement)) return false
+    if (element.querySelector(".opencoder-status-actions")) return false
+    var tablist = element.querySelector('[data-slot="tablist"]')
+    if (!tablist) return false
+    var tabText = (tablist.textContent || "").toLowerCase()
+    if (tabText.indexOf("mcp") === -1 || tabText.indexOf("lsp") === -1) return false
+    if (tabText.indexOf("servers") === -1 && tabText.indexOf("plugins") === -1) return false
+    return true
+  }
+
+  function isStatusPopoverDataTabs(element) {
+    if (!(element instanceof HTMLElement)) return false
+    var active = element.getAttribute("data-active")
+    if (active !== "servers" && active !== "mcp" && active !== "lsp" && active !== "plugins") return false
+    return element.querySelectorAll('[data-slot="tab"]').length >= 3
+  }
+
+  function installActions() {
+    installTitlebarActions()
+
+    var tabs = Array.prototype.find.call(document.querySelectorAll('[data-component="tabs"]'), isStatusPopoverDataTabs)
+      || Array.prototype.find.call(document.querySelectorAll('[data-slot="tablist"]'), function(tablist) {
+        return isStatusPopoverTabs(tablist.parentElement)
+      })?.parentElement
+    if (!tabs || tabs.querySelector(".opencoder-status-actions")) return
+    tabs.setAttribute("data-opencoder-status-actions", "true")
+
+    var row = document.createElement("div")
+    row.className = "opencoder-status-actions"
+    row.append(
+      makeButton("newSession", "add", "New Session"),
+      makeButton("refresh", "refresh", "Refresh"),
+      makeButton("openSettings", "settings", "Settings"),
+    )
+
+    var tablist = tabs.querySelector('[data-slot="tablist"]')
+    if (tablist && tablist.parentNode === tabs) tabs.insertBefore(row, tablist.nextSibling)
+    else tabs.prepend(row)
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", installActions, { once: true })
+  } else {
+    installActions()
+  }
+
+  var observer = new MutationObserver(installActions)
+  observer.observe(document.documentElement, { childList: true, subtree: true })
+})()`;
+
 // CSS that maps the OpenCode app colours to VS Code's CSS variables so the
 // webview automatically matches whatever theme the user has active — light,
 // dark, high-contrast, etc. — without any hardcoded palette.
@@ -378,6 +485,226 @@ export function getWebviewHtml(
     }
   </style>`;
 
+  const statusActionsCSS = `<style nonce="${nonce}">
+    :root {
+      --opencoder-header-surface: var(--background-base, var(--vscode-sideBar-background, #342815));
+      --opencoder-darker-theme-surface: var(--opencoder-header-surface);
+      --opencoder-prompt-surface: color-mix(in srgb, var(--opencoder-header-surface) 78%, var(--text-base) 22%);
+      --opencoder-control-surface: var(--vscode-button-secondaryBackground, var(--surface-raised-stronger-non-alpha));
+      --opencoder-control-surface-hover: var(--vscode-button-secondaryHoverBackground, var(--surface-raised-base-hover));
+      --background-strong: var(--opencoder-header-surface) !important;
+      --background-stronger: var(--opencoder-header-surface) !important;
+      --color-background-strong: var(--opencoder-header-surface) !important;
+      --color-background-stronger: var(--opencoder-header-surface) !important;
+    }
+
+    html,
+    body,
+    #root {
+      background-color: var(--opencoder-darker-theme-surface) !important;
+    }
+
+    [data-component="popover-content"]:has(.opencoder-status-actions) [data-component="tabs"],
+    [data-component="popover-content"]:has(.opencoder-status-actions) .tabs,
+    [data-opencoder-status-actions="true"] {
+      background: var(--opencoder-darker-theme-surface) !important;
+      box-shadow: 0 8px 24px color-mix(in srgb, var(--vscode-widget-shadow, #000) 28%, transparent) !important;
+    }
+
+    .opencoder-status-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 12px 8px;
+    }
+
+    .opencoder-titlebar-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      margin-right: 4px;
+    }
+
+    .opencoder-status-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      min-width: 0;
+      height: 28px;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--vscode-button-secondaryBackground, var(--surface-raised-stronger-non-alpha));
+      color: var(--text-base);
+      font: inherit;
+      font-size: 12px;
+      line-height: 1;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .opencoder-titlebar-actions .opencoder-status-action {
+      width: 32px;
+      height: 24px;
+      padding: 0;
+      border-radius: 6px;
+      background: transparent !important;
+    }
+
+    .opencoder-titlebar-actions .opencoder-status-action-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .opencoder-status-action:hover {
+      background: var(--vscode-button-secondaryHoverBackground, var(--surface-raised-base-hover));
+    }
+
+    .opencoder-titlebar-actions .opencoder-status-action:hover {
+      background: var(--vscode-toolbar-hoverBackground, var(--surface-raised-base-hover)) !important;
+    }
+
+    .opencoder-status-action:focus-visible {
+      outline: 1px solid var(--focus-border);
+      outline-offset: 1px;
+    }
+
+    .opencoder-status-action-icon {
+      display: inline-flex;
+      width: 14px;
+      height: 14px;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-strong);
+      flex: 0 0 auto;
+    }
+
+    .opencoder-status-action-icon svg {
+      display: block;
+      width: 14px;
+      height: 14px;
+    }
+
+    [data-component="session-prompt-dock"],
+    [data-component="dock-prompt"] {
+      background: var(--opencoder-darker-theme-surface) !important;
+    }
+
+    .bg-background-stronger,
+    .bg-background-base {
+      background-color: var(--opencoder-darker-theme-surface) !important;
+    }
+
+    [data-component="session-prompt-dock"],
+    [data-component="session-prompt-dock"] > *,
+    [data-component="session-prompt-dock"] :where(
+      [data-component="dock-prompt"],
+      [data-component="dock-prompt"] > *,
+      [data-component="dock-prompt"] [data-slot$="-header"],
+      [data-component="dock-prompt"] [data-slot$="-content"],
+      [data-component="dock-prompt"] [data-slot$="-footer"]
+    ) {
+      background: transparent !important;
+      box-shadow: none !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      outline: 0 !important;
+    }
+
+    [data-component="dock-prompt"] > .relative,
+    [data-component="session-prompt-dock"] [data-component="dock-prompt"] > .relative {
+      background: transparent !important;
+      box-shadow: none !important;
+      overflow: visible;
+      border: 0 !important;
+      border-radius: 0 !important;
+      outline: 0 !important;
+    }
+
+    [data-component="dock-prompt"] {
+      border: 0 !important;
+      box-shadow: none !important;
+      outline: 0 !important;
+    }
+
+    [data-component="dock-prompt"] .relative:has(> .relative > [data-component="prompt-input"]) {
+      background: transparent !important;
+      box-shadow: none !important;
+      border: 0 !important;
+      outline: 0 !important;
+      overflow: visible !important;
+      padding-bottom: 42px !important;
+    }
+
+    [data-component="dock-prompt"] .relative:has(> [data-component="prompt-input"]) {
+      background: transparent !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      overflow: visible !important;
+    }
+
+    [data-component="dock-prompt"] .relative:has(> .relative > [data-component="prompt-input"]) > .pointer-events-none.absolute.bottom-2 {
+      bottom: 0 !important;
+    }
+
+    [data-component="prompt-input"] {
+      min-height: 92px;
+      padding-bottom: 14px !important;
+      background: transparent !important;
+      color: var(--text-strong) !important;
+      caret-color: var(--vscode-focusBorder, var(--oc-vscode-accent));
+    }
+
+    [data-component="prompt-input"]:focus {
+      outline: none;
+    }
+
+    [data-component="prompt-input"] + [aria-hidden="true"] {
+      display: none !important;
+      background: none !important;
+    }
+
+    [data-dock-surface="shell"] {
+      box-shadow: none !important;
+      background-color: var(--opencoder-prompt-surface) !important;
+    }
+
+    [data-dock-surface="tray"] {
+      border: 0 !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      border-radius: 0 !important;
+      overflow: visible !important;
+    }
+
+    [data-component="prompt-model-control"],
+    [data-component="prompt-agent-control"],
+    [data-component="prompt-variant-control"] {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      max-width: 100%;
+      border: 0;
+      border-radius: 6px;
+      background: var(--opencoder-control-surface) !important;
+      box-shadow: 0 1px 0 color-mix(in srgb, var(--vscode-widget-shadow, #000) 16%, transparent);
+    }
+
+    [data-component="prompt-model-control"]:hover,
+    [data-component="prompt-agent-control"]:hover,
+    [data-component="prompt-variant-control"]:hover {
+      background: var(--opencoder-control-surface-hover) !important;
+    }
+  </style>`;
+
   const settingsModeCSS = config.settingsMode
     ? `<style nonce="${nonce}">
     #root[data-settings-ready="false"] { opacity: 0; }
@@ -405,10 +732,12 @@ export function getWebviewHtml(
     <link href="${styleUri}" rel="stylesheet" />
     ${systemThemeCSS}
     ${codeBlockCSS}
+    ${statusActionsCSS}
     ${settingsModeCSS}
     <script nonce="${nonce}">window.__OPENCODE_VSCODE_CONFIG__ = ${JSON.stringify(config)};</script>
     <script nonce="${nonce}">${storagePreload}</script>
     <script nonce="${nonce}">${themePreload}</script>
+    <script nonce="${nonce}">${statusActionsPreload}</script>
     <title>Opencoder</title>
   </head>
   <body class="antialiased overscroll-none overflow-hidden">
