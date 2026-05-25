@@ -581,8 +581,8 @@ export function getWebviewHtml(
       --opencoder-control-surface-hover: color-mix(in srgb, var(--opencoder-control-surface) 86%, var(--oc-vscode-fg) 14%);
       --opencoder-prompt-surface: var(--opencoder-control-surface);
       --opencoder-prompt-border: var(--opencoder-control-surface);
-      --opencoder-user-message-surface: color-mix(in srgb, var(--opencoder-control-surface) 82%, var(--oc-vscode-fg) 18%);
-      --opencoder-user-message-border: color-mix(in srgb, var(--opencoder-user-message-surface) 72%, var(--oc-vscode-fg) 28%);
+      --opencoder-user-message-surface: color-mix(in srgb, var(--opencoder-control-surface) 98%, var(--oc-vscode-accent) 2%);
+      --opencoder-user-message-border: color-mix(in srgb, var(--opencoder-user-message-surface) 65%, var(--oc-vscode-fg) 35%);
       --background-strong: var(--opencoder-header-surface) !important;
       --background-stronger: var(--opencoder-header-surface) !important;
       --color-background-strong: var(--opencoder-header-surface) !important;
