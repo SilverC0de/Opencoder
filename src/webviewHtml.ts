@@ -373,6 +373,7 @@ function buildSystemThemeCSS(colorScheme: "light" | "dark"): string {
       --oc-vscode-editor:   var(--vscode-editor-background) !important;
       --oc-vscode-fg:       var(--vscode-sideBar-foreground, var(--vscode-editor-foreground)) !important;
       --oc-vscode-muted:    var(--vscode-descriptionForeground, var(--vscode-disabledForeground)) !important;
+      --oc-vscode-float-fg: var(--vscode-editorHoverWidget-foreground, var(--vscode-editorWidget-foreground, var(--oc-vscode-fg))) !important;
       --oc-vscode-border:   var(--vscode-sideBar-border, var(--vscode-panel-border, var(--vscode-widget-border))) !important;
       --oc-vscode-accent:   var(--vscode-button-background, var(--vscode-textLink-foreground)) !important;
       --oc-vscode-accent-fg: var(--vscode-button-foreground, var(--vscode-editor-background)) !important;
@@ -445,6 +446,10 @@ function buildSystemThemeCSS(colorScheme: "light" | "dark"): string {
       --text-stronger:     var(--oc-vscode-fg) !important;
       --text-weak:         var(--oc-vscode-muted) !important;
       --text-weaker:       var(--vscode-disabledForeground, var(--oc-vscode-muted)) !important;
+      --text-invert-base:   var(--oc-vscode-float-fg) !important;
+      --text-invert-weak:   var(--oc-vscode-float-fg) !important;
+      --text-invert-weaker: color-mix(in srgb, var(--oc-vscode-float-fg) 72%, transparent) !important;
+      --text-invert-strong: var(--oc-vscode-float-fg) !important;
       --text-interactive-base: var(--vscode-textLink-foreground, var(--oc-vscode-accent)) !important;
       --text-on-interactive-base: var(--oc-vscode-accent-fg) !important;
       --text-on-interactive-weak: var(--oc-vscode-fg) !important;
@@ -572,10 +577,12 @@ export function getWebviewHtml(
     :root {
       --opencoder-header-surface: var(--background-base, var(--vscode-sideBar-background, #342815));
       --opencoder-darker-theme-surface: var(--opencoder-header-surface);
-      --opencoder-prompt-surface: color-mix(in srgb, var(--opencoder-darker-theme-surface) 88%, var(--oc-vscode-fg) 12%);
-      --opencoder-prompt-border: color-mix(in srgb, var(--vscode-focusBorder, var(--oc-vscode-accent)) 64%, var(--oc-vscode-fg) 24%);
       --opencoder-control-surface: color-mix(in srgb, var(--opencoder-darker-theme-surface) 82%, var(--oc-vscode-fg) 18%);
       --opencoder-control-surface-hover: color-mix(in srgb, var(--opencoder-control-surface) 86%, var(--oc-vscode-fg) 14%);
+      --opencoder-prompt-surface: var(--opencoder-control-surface);
+      --opencoder-prompt-border: var(--opencoder-control-surface);
+      --opencoder-user-message-surface: color-mix(in srgb, var(--opencoder-control-surface) 82%, var(--oc-vscode-fg) 18%);
+      --opencoder-user-message-border: color-mix(in srgb, var(--opencoder-user-message-surface) 72%, var(--oc-vscode-fg) 28%);
       --background-strong: var(--opencoder-header-surface) !important;
       --background-stronger: var(--opencoder-header-surface) !important;
       --color-background-strong: var(--opencoder-header-surface) !important;
@@ -761,16 +768,50 @@ export function getWebviewHtml(
       outline: 0 !important;
     }
 
-    [data-component="dock-prompt"] .relative:has(> .relative > [data-component="prompt-input"]) {
-      background: var(--opencoder-prompt-surface) !important;
-      border: 2px solid var(--opencoder-prompt-border) !important;
+    [data-component="tooltip"] {
+      background: var(--surface-float-base) !important;
+      color: var(--text-invert-strong) !important;
+      border-color: var(--border-weak-base) !important;
+    }
+
+    [data-component="tooltip"] :where(.text-text-invert-strong, .text-text-invert-base, span, div) {
+      color: inherit !important;
+    }
+
+    [data-component="user-message"] [data-slot="user-message-text"] {
+      background: var(--opencoder-user-message-surface) !important;
+      border: 1px solid var(--opencoder-user-message-border) !important;
       border-radius: 8px !important;
-      box-shadow: 0 0 0 1px color-mix(in srgb, var(--opencoder-prompt-border) 28%, transparent) !important;
+      box-shadow:
+        inset 0 1px 0 color-mix(in srgb, var(--oc-vscode-fg) 8%, transparent),
+        0 1px 8px color-mix(in srgb, var(--vscode-widget-shadow, #000) 16%, transparent) !important;
+      color: var(--text-strong) !important;
+    }
+
+    [data-component="user-message"] [data-slot="user-message-attachment"] {
+      background: var(--opencoder-user-message-surface) !important;
+      border-color: var(--opencoder-user-message-border) !important;
+    }
+
+    [data-component="user-message"] [data-slot="user-message-copy-wrapper"] {
+      color: var(--text-weak) !important;
+    }
+
+    .relative:has(> .relative > [data-component="prompt-input"]) {
+      background: var(--opencoder-prompt-surface) !important;
+      border: 1px solid var(--opencoder-prompt-border) !important;
+      border-radius: 8px !important;
+      box-shadow: none !important;
       outline: 0 !important;
       overflow: hidden !important;
     }
 
-    [data-component="dock-prompt"] .relative:has(> [data-component="prompt-input"]) {
+    .relative:has(> .relative > [data-component="prompt-input"]) > [aria-hidden="true"] {
+      display: none !important;
+      background: none !important;
+    }
+
+    .relative:has(> [data-component="prompt-input"]) {
       background: transparent !important;
       box-shadow: none !important;
       border: 0 !important;
