@@ -2,7 +2,7 @@
   "name": "opencoder-ui",
   "displayName": "Opencoder — A Clean Opencode Interface",
   "description": "A clean and polished VS Code interface for OpenCode",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "siilver",
   "license": "MIT",
   "icon": "opencoder.png",
