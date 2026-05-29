@@ -625,6 +625,12 @@ export function getWebviewHtml(
       --opencoder-control-surface-hover: color-mix(in srgb, var(--opencoder-control-surface) 86%, var(--oc-vscode-fg) 14%);
       --opencoder-prompt-surface: var(--opencoder-control-surface);
       --opencoder-prompt-border: var(--opencoder-control-surface);
+      --opencoder-tab-active-surface: var(--vscode-list-activeSelectionBackground, var(--surface-base-active));
+      --opencoder-tab-active-surface-hover: var(--vscode-list-inactiveSelectionBackground, color-mix(in srgb, var(--opencoder-tab-active-surface) 88%, var(--oc-vscode-fg) 12%));
+      --opencoder-control-surface: var(--opencoder-tab-active-surface);
+      --opencoder-control-surface-hover: var(--opencoder-tab-active-surface-hover);
+      --opencoder-prompt-surface: var(--opencoder-tab-active-surface);
+      --opencoder-prompt-border: color-mix(in srgb, var(--opencoder-tab-active-surface) 70%, var(--vscode-focusBorder, var(--oc-vscode-accent)) 30%);
       --opencoder-user-message-surface: color-mix(in srgb, var(--opencoder-control-surface) 98%, var(--oc-vscode-accent) 2%);
       --opencoder-user-message-border: color-mix(in srgb, var(--opencoder-user-message-surface) 65%, var(--oc-vscode-fg) 35%);
       --background-strong: var(--opencoder-header-surface) !important;
@@ -871,7 +877,7 @@ export function getWebviewHtml(
       border-radius: 0 !important;
       box-shadow: none !important;
       color: var(--text-strong) !important;
-      caret-color: var(--vscode-focusBorder, var(--oc-vscode-accent));
+      caret-color: var(--oc-vscode-fg);
     }
 
     [data-component="prompt-input"]:focus {

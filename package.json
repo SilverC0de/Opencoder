@@ -1,7 +1,7 @@
 {
   "name": "opencoder-ui",
-  "displayName": "Opencoder UI",
-  "description": "OpenCode VSCode Extension",
+  "displayName": "Opencoder — A Clean Opencode Interface",
+  "description": "A clean and polished VS Code interface for OpenCode",
   "version": "0.1.0",
   "publisher": "siilver",
   "license": "MIT",
