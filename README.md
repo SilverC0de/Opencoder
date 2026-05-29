@@ -1,4 +1,4 @@
-# Opencoder
+# Opencoder — A Clean Opencode Interface
 
 Access OpenCode AI directly in VS Code with a sidebar extension.
 
